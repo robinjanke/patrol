@@ -341,6 +341,13 @@ class NativeAutomator {
     await _wrapRequest('pressHome', _client.pressHome);
   }
 
+  /// Create a screenshot of the current screen and upload it to S3
+  ///
+  /// Currently only iOS is supported
+  Future<void> createScreenshot({required screenshotTitle}) async {
+    await _wrapRequest('createScreenshot', _client.createScreenshot);
+  }
+
   /// Opens the app specified by [appId]. If [appId] is null, then the app under
   /// test is started (using [resolvedAppId]).
   ///

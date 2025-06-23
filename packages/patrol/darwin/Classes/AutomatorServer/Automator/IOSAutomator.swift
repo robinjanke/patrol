@@ -35,6 +35,32 @@
       }
     }
 
+    func createScreenshot() throws {
+      // let screenshotName: String = "demo.png"
+      try runAction("create a screenshot from the device") {
+
+        // Use XCUIScreen to take a screenshot
+        let fullScreenshot = XCUIScreen.main.screenshot()
+
+        let screenshotAttachment = XCTAttachment(
+            uniformTypeIdentifier: "public.png",
+            name: "Screenshot-\(UIDevice.current.name)-demo.png",
+            payload: fullScreenshot.pngRepresentation,
+            userInfo: nil)
+
+        // Usually Xcode will delete attachments after
+        // the test has run; we don't want that!
+        screenshotAttachment.lifetime = .keepAlways
+
+//        if (!screenshotAttachment.name.isEmpty)  {
+//            screenshotName = screenshotAttachment.name
+//        }
+
+      }
+
+      // return screenshotName
+    }
+
     func openApp(_ bundleId: String) throws {
       try runAction("opening app with id \(bundleId)") {
         let app = try self.getApp(withBundleId: bundleId)

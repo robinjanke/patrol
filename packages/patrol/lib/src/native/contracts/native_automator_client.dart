@@ -60,6 +60,12 @@ class NativeAutomatorClient {
     );
   }
 
+  Future<void> createScreenshot() {
+    return _sendRequest(
+      'createScreenshot',
+    );
+  }
+
   Future<void> pressBack() {
     return _sendRequest(
       'pressBack',

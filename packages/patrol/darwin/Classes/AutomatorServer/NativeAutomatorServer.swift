@@ -9,6 +9,7 @@ protocol NativeAutomatorServer {
     func initialize() throws
     func configure(request: ConfigureRequest) throws
     func pressHome() throws
+    func createScreenshot() throws
     func pressBack() throws
     func pressRecentApps() throws
     func doublePressRecentApps() throws
@@ -64,6 +65,15 @@ extension NativeAutomatorServer {
 
     private func pressHomeHandler(request: HTTPRequest) throws -> HTTPResponse {
         try pressHome()
+        return HTTPResponse(.ok)
+    }
+
+    private func createScreenshotHandler(request: HTTPRequest) throws -> HTTPResponse {
+        // let response: String = try createScreenshot()
+        try createScreenshot()
+        // let body = try JSONEncoder().encode(response)
+        // return HTTPResponse(.ok)
+        // return HTTPResponse(.ok, body: "demo")
         return HTTPResponse(.ok)
     }
 

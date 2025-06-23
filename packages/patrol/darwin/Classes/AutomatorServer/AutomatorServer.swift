@@ -20,6 +20,12 @@
 
     // MARK: General
 
+    func createScreenshot() throws {
+      return try runCatching {
+        try automator.createScreenshot()
+      }
+    }
+
     func pressHome() throws {
       return try runCatching {
         try automator.pressHome()

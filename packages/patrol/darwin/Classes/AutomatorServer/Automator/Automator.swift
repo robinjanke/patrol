@@ -183,6 +183,7 @@ extension Selector {
 
     // MARK: General
     func pressHome() throws
+    func createScreenshot() throws
     func openApp(_ bundleId: String) throws
     func openAppSwitcher() throws
     func openControlCenter() throws
