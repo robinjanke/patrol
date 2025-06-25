@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -69,10 +70,10 @@ class NativeAutomatorConfig {
     ),
     this.packageName = const String.fromEnvironment('PATROL_APP_PACKAGE_NAME'),
     this.iosInstalledApps =
-        const String.fromEnvironment('PATROL_IOS_INSTALLED_APPS'),
+    const String.fromEnvironment('PATROL_IOS_INSTALLED_APPS'),
     this.bundleId = const String.fromEnvironment('PATROL_APP_BUNDLE_ID'),
     this.androidAppName =
-        const String.fromEnvironment('PATROL_ANDROID_APP_NAME'),
+    const String.fromEnvironment('PATROL_ANDROID_APP_NAME'),
     this.iosAppName = const String.fromEnvironment('PATROL_IOS_APP_NAME'),
     this.connectionTimeout = const Duration(seconds: 60),
     this.findTimeout = const Duration(seconds: 10),
@@ -176,9 +177,9 @@ class NativeAutomator {
   /// Creates a new [NativeAutomator].
   NativeAutomator({required NativeAutomatorConfig config})
       : assert(
-          config.connectionTimeout > config.findTimeout,
-          'find timeout is longer than connection timeout',
-        ),
+  config.connectionTimeout > config.findTimeout,
+  'find timeout is longer than connection timeout',
+  ),
         _config = config {
     if (_config.packageName.isEmpty && io.Platform.isAndroid) {
       _config.logger("packageName is not set. It's recommended to set it.");
@@ -216,11 +217,10 @@ class NativeAutomator {
     throw StateError('unsupported platform');
   }
 
-  Future<T> _wrapRequest<T>(
-    String name,
-    Future<T> Function() request, {
-    bool enablePatrolLog = true,
-  }) async {
+  Future<T> _wrapRequest<T>(String name,
+      Future<T> Function() request, {
+        bool enablePatrolLog = true,
+      }) async {
     _config.logger('$name() started');
     final text =
         '${AnsiCodes.lightBlue}$name${AnsiCodes.reset} ${AnsiCodes.gray}(native)${AnsiCodes.reset}';
@@ -293,11 +293,12 @@ class NativeAutomator {
       try {
         await _wrapRequest(
           'configure',
-          () => _client.configure(
-            ConfigureRequest(
-              findTimeoutMillis: _config.findTimeout.inMilliseconds,
-            ),
-          ),
+              () =>
+              _client.configure(
+                ConfigureRequest(
+                  findTimeoutMillis: _config.findTimeout.inMilliseconds,
+                ),
+              ),
           enablePatrolLog: false,
         );
         exception = null;
@@ -344,8 +345,17 @@ class NativeAutomator {
   /// Create a screenshot of the current screen and upload it to S3
   ///
   /// Currently only iOS is supported
-  Future<void> createScreenshot({required screenshotTitle}) async {
-    await _wrapRequest('createScreenshot', _client.createScreenshot);
+  Future<dynamic> createScreenshot({required screenshotTitle, required screenshotDirectory}) async {
+    Uint8List response = await _wrapRequest(
+      'createScreenshot',
+          () => _client.createScreenshot(),
+    );
+
+    final io.File screenshotFile = io.File("${screenshotDirectory}/${screenshotTitle}.png");
+    await screenshotFile.create();
+    await screenshotFile.writeAsBytes(
+      response.toList()
+    );
   }
 
   /// Opens the app specified by [appId]. If [appId] is null, then the app under
@@ -355,7 +365,7 @@ class NativeAutomator {
   Future<void> openApp({String? appId}) async {
     await _wrapRequest(
       'openApp',
-      () => _client.openApp(OpenAppRequest(appId: appId ?? resolvedAppId)),
+          () => _client.openApp(OpenAppRequest(appId: appId ?? resolvedAppId)),
     );
   }
 
@@ -400,7 +410,7 @@ class NativeAutomator {
   Future<void> openQuickSettings() async {
     await _wrapRequest(
       'openQuickSettings',
-      () => _client.openQuickSettings(OpenQuickSettingsRequest()),
+          () => _client.openQuickSettings(OpenQuickSettingsRequest()),
     );
   }
 
@@ -408,7 +418,7 @@ class NativeAutomator {
   Future<void> openUrl(String url) async {
     await _wrapRequest(
       'openUrl',
-      () => _client.openUrl(OpenUrlRequest(url: url)),
+          () => _client.openUrl(OpenUrlRequest(url: url)),
     );
   }
 
@@ -418,9 +428,10 @@ class NativeAutomator {
   Future<Notification> getFirstNotification() async {
     final response = await _wrapRequest(
       'getFirstNotification',
-      () => _client.getNotifications(
-        GetNotificationsRequest(),
-      ),
+          () =>
+          _client.getNotifications(
+            GetNotificationsRequest(),
+          ),
     );
 
     return response.notifications.first;
@@ -432,9 +443,10 @@ class NativeAutomator {
   Future<List<Notification>> getNotifications() async {
     final response = await _wrapRequest(
       'getNotifications',
-      () => _client.getNotifications(
-        GetNotificationsRequest(),
-      ),
+          () =>
+          _client.getNotifications(
+            GetNotificationsRequest(),
+          ),
     );
 
     return response.notifications;
@@ -463,18 +475,18 @@ class NativeAutomator {
   ///
   ///  * [tapOnNotificationBySelector], which allows for more precise
   ///    specification of the notification to tap on
-  Future<void> tapOnNotificationByIndex(
-    int index, {
+  Future<void> tapOnNotificationByIndex(int index, {
     Duration? timeout,
   }) async {
     await _wrapRequest(
       'tapOnNotificationByIndex',
-      () => _client.tapOnNotification(
-        TapOnNotificationRequest(
-          index: index,
-          timeoutMillis: timeout?.inMilliseconds,
-        ),
-      ),
+          () =>
+          _client.tapOnNotification(
+            TapOnNotificationRequest(
+              index: index,
+              timeoutMillis: timeout?.inMilliseconds,
+            ),
+          ),
     );
   }
 
@@ -492,18 +504,18 @@ class NativeAutomator {
   /// See also:
   ///
   /// * [tapOnNotificationByIndex], which is less flexible but also less verbose
-  Future<void> tapOnNotificationBySelector(
-    Selector selector, {
+  Future<void> tapOnNotificationBySelector(Selector selector, {
     Duration? timeout,
   }) async {
     await _wrapRequest(
       'tapOnNotificationBySelector',
-      () => _client.tapOnNotification(
-        TapOnNotificationRequest(
-          selector: selector,
-          timeoutMillis: timeout?.inMilliseconds,
-        ),
-      ),
+          () =>
+          _client.tapOnNotification(
+            TapOnNotificationRequest(
+              selector: selector,
+              timeoutMillis: timeout?.inMilliseconds,
+            ),
+          ),
     );
   }
 
@@ -541,9 +553,10 @@ class NativeAutomator {
   Future<void> enableDarkMode({String? appId}) async {
     await _wrapRequest(
       'enableDarkMode',
-      () => _client.enableDarkMode(
-        DarkModeRequest(appId: appId ?? resolvedAppId),
-      ),
+          () =>
+          _client.enableDarkMode(
+            DarkModeRequest(appId: appId ?? resolvedAppId),
+          ),
     );
   }
 
@@ -551,9 +564,10 @@ class NativeAutomator {
   Future<void> disableDarkMode({String? appId}) async {
     await _wrapRequest(
       'disableDarkMode',
-      () => _client.disableDarkMode(
-        DarkModeRequest(appId: appId ?? resolvedAppId),
-      ),
+          () =>
+          _client.disableDarkMode(
+            DarkModeRequest(appId: appId ?? resolvedAppId),
+          ),
     );
   }
 
@@ -629,8 +643,7 @@ class NativeAutomator {
   /// [timeout] is not specified, it utilizes the
   /// [NativeAutomatorConfig.findTimeout] duration from the configuration.
   /// If the native view is not found, an exception is thrown.
-  Future<void> tap(
-    Selector selector, {
+  Future<void> tap(Selector selector, {
     String? appId,
     Duration? timeout,
   }) async {
@@ -660,22 +673,22 @@ class NativeAutomator {
   ///
   /// Note: The [delayBetweenTaps] parameter is currently respected only
   /// for Android.
-  Future<void> doubleTap(
-    Selector selector, {
+  Future<void> doubleTap(Selector selector, {
     String? appId,
     Duration? timeout,
     Duration? delayBetweenTaps,
   }) async {
     await _wrapRequest(
       'doubleTap',
-      () => _client.doubleTap(
-        TapRequest(
-          selector: selector,
-          appId: appId ?? resolvedAppId,
-          timeoutMillis: timeout?.inMilliseconds,
-          delayBetweenTapsMillis: delayBetweenTaps?.inMilliseconds,
-        ),
-      ),
+          () =>
+          _client.doubleTap(
+            TapRequest(
+              selector: selector,
+              appId: appId ?? resolvedAppId,
+              timeoutMillis: timeout?.inMilliseconds,
+              delayBetweenTapsMillis: delayBetweenTaps?.inMilliseconds,
+            ),
+          ),
     );
   }
 
@@ -714,8 +727,7 @@ class NativeAutomator {
   ///
   /// See also:
   ///  * [enterTextByIndex], which is less flexible but also less verbose
-  Future<void> enterText(
-    Selector selector, {
+  Future<void> enterText(Selector selector, {
     required String text,
     String? appId,
     KeyboardBehavior? keyboardBehavior,
@@ -727,18 +739,19 @@ class NativeAutomator {
 
     await _wrapRequest(
       'enterText',
-      () => _client.enterText(
-        EnterTextRequest(
-          data: text,
-          appId: appId ?? resolvedAppId,
-          selector: selector,
-          keyboardBehavior:
+          () =>
+          _client.enterText(
+            EnterTextRequest(
+              data: text,
+              appId: appId ?? resolvedAppId,
+              selector: selector,
+              keyboardBehavior:
               (keyboardBehavior ?? _config.keyboardBehavior).toContractsEnum,
-          timeoutMillis: timeout?.inMilliseconds,
-          dx: tapLocation.dx,
-          dy: tapLocation.dy,
-        ),
-      ),
+              timeoutMillis: timeout?.inMilliseconds,
+              dx: tapLocation.dx,
+              dy: tapLocation.dy,
+            ),
+          ),
     );
   }
 
@@ -756,8 +769,7 @@ class NativeAutomator {
   /// See also:
   ///  * [enterText], which allows for more precise specification of the text
   ///    field to enter text into
-  Future<void> enterTextByIndex(
-    String text, {
+  Future<void> enterTextByIndex(String text, {
     required int index,
     String? appId,
     KeyboardBehavior? keyboardBehavior,
@@ -769,18 +781,19 @@ class NativeAutomator {
 
     await _wrapRequest(
       'enterTextByIndex',
-      () => _client.enterText(
-        EnterTextRequest(
-          data: text,
-          appId: appId ?? resolvedAppId,
-          index: index,
-          keyboardBehavior:
+          () =>
+          _client.enterText(
+            EnterTextRequest(
+              data: text,
+              appId: appId ?? resolvedAppId,
+              index: index,
+              keyboardBehavior:
               (keyboardBehavior ?? _config.keyboardBehavior).toContractsEnum,
-          timeoutMillis: timeout?.inMilliseconds,
-          dx: tapLocation.dx,
-          dy: tapLocation.dy,
-        ),
-      ),
+              timeoutMillis: timeout?.inMilliseconds,
+              dx: tapLocation.dx,
+              dy: tapLocation.dy,
+            ),
+          ),
     );
   }
 
@@ -804,16 +817,17 @@ class NativeAutomator {
 
     await _wrapRequest(
       'swipe',
-      () => _client.swipe(
-        SwipeRequest(
-          startX: from.dx,
-          startY: from.dy,
-          endX: to.dx,
-          endY: to.dy,
-          steps: steps,
-          appId: appId ?? resolvedAppId,
-        ),
-      ),
+          () =>
+          _client.swipe(
+            SwipeRequest(
+              startX: from.dx,
+              startY: from.dy,
+              endX: to.dx,
+              endY: to.dy,
+              steps: steps,
+              appId: appId ?? resolvedAppId,
+            ),
+          ),
     );
   }
 
@@ -821,37 +835,37 @@ class NativeAutomator {
   /// It waits for the view to become visible for [timeout] duration. If
   /// [timeout] is not specified, it utilizes the
   /// [NativeAutomatorConfig.findTimeout].
-  Future<void> waitUntilVisible(
-    Selector selector, {
+  Future<void> waitUntilVisible(Selector selector, {
     String? appId,
     Duration? timeout,
   }) async {
     await _wrapRequest(
       'waitUntilVisible',
-      () => _client.waitUntilVisible(
-        WaitUntilVisibleRequest(
-          selector: selector,
-          appId: appId ?? resolvedAppId,
-          timeoutMillis: timeout?.inMilliseconds,
-        ),
-      ),
+          () =>
+          _client.waitUntilVisible(
+            WaitUntilVisibleRequest(
+              selector: selector,
+              appId: appId ?? resolvedAppId,
+              timeoutMillis: timeout?.inMilliseconds,
+            ),
+          ),
     );
   }
 
   /// Returns a list of currently visible native UI controls, specified by
   /// [selector], which are currently visible on screen.
-  Future<List<NativeView>> getNativeViews(
-    Selector selector, {
+  Future<List<NativeView>> getNativeViews(Selector selector, {
     String? appId,
   }) async {
     final response = await _wrapRequest(
       'getNativeViews',
-      () => _client.getNativeViews(
-        GetNativeViewsRequest(
-          selector: selector,
-          appId: appId ?? resolvedAppId,
-        ),
-      ),
+          () =>
+          _client.getNativeViews(
+            GetNativeViewsRequest(
+              selector: selector,
+              appId: appId ?? resolvedAppId,
+            ),
+          ),
     );
 
     return response.nativeViews;
@@ -866,11 +880,12 @@ class NativeAutomator {
   }) async {
     final response = await _wrapRequest(
       'isPermissionDialogVisible',
-      () => _client.isPermissionDialogVisible(
-        PermissionDialogVisibleRequest(
-          timeoutMillis: timeout.inMilliseconds,
-        ),
-      ),
+          () =>
+          _client.isPermissionDialogVisible(
+            PermissionDialogVisibleRequest(
+              timeoutMillis: timeout.inMilliseconds,
+            ),
+          ),
     );
 
     return response.visible;
@@ -892,9 +907,10 @@ class NativeAutomator {
   Future<void> grantPermissionWhenInUse() async {
     await _wrapRequest(
       'grantPermissionWhenInUse',
-      () => _client.handlePermissionDialog(
-        HandlePermissionRequest(code: HandlePermissionRequestCode.whileUsing),
-      ),
+          () =>
+          _client.handlePermissionDialog(
+            HandlePermissionRequest(code: HandlePermissionRequestCode.whileUsing),
+          ),
     );
   }
 
@@ -921,11 +937,12 @@ class NativeAutomator {
   Future<void> grantPermissionOnlyThisTime() async {
     await _wrapRequest(
       'grantPermissionOnlyThisTime',
-      () => _client.handlePermissionDialog(
-        HandlePermissionRequest(
-          code: HandlePermissionRequestCode.onlyThisTime,
-        ),
-      ),
+          () =>
+          _client.handlePermissionDialog(
+            HandlePermissionRequest(
+              code: HandlePermissionRequestCode.onlyThisTime,
+            ),
+          ),
     );
   }
 
@@ -945,9 +962,10 @@ class NativeAutomator {
   Future<void> denyPermission() async {
     await _wrapRequest(
       'denyPermission',
-      () => _client.handlePermissionDialog(
-        HandlePermissionRequest(code: HandlePermissionRequestCode.denied),
-      ),
+          () =>
+          _client.handlePermissionDialog(
+            HandlePermissionRequest(code: HandlePermissionRequestCode.denied),
+          ),
     );
   }
 
@@ -958,11 +976,12 @@ class NativeAutomator {
   Future<void> selectCoarseLocation() async {
     await _wrapRequest(
       'selectCoarseLocation',
-      () => _client.setLocationAccuracy(
-        SetLocationAccuracyRequest(
-          locationAccuracy: SetLocationAccuracyRequestLocationAccuracy.coarse,
-        ),
-      ),
+          () =>
+          _client.setLocationAccuracy(
+            SetLocationAccuracyRequest(
+              locationAccuracy: SetLocationAccuracyRequestLocationAccuracy.coarse,
+            ),
+          ),
     );
   }
 
@@ -973,11 +992,12 @@ class NativeAutomator {
   Future<void> selectFineLocation() async {
     await _wrapRequest(
       'selectFineLocation',
-      () => _client.setLocationAccuracy(
-        SetLocationAccuracyRequest(
-          locationAccuracy: SetLocationAccuracyRequestLocationAccuracy.fine,
-        ),
-      ),
+          () =>
+          _client.setLocationAccuracy(
+            SetLocationAccuracyRequest(
+              locationAccuracy: SetLocationAccuracyRequestLocationAccuracy.fine,
+            ),
+          ),
     );
   }
 
@@ -985,20 +1005,20 @@ class NativeAutomator {
   ///
   /// Works on Android emulator, iOS simulator and iOS real device. Doesn't
   /// work on Android real device.
-  Future<void> setMockLocation(
-    double latitude,
-    double longitude, {
-    String? packageName,
-  }) async {
+  Future<void> setMockLocation(double latitude,
+      double longitude, {
+        String? packageName,
+      }) async {
     await _wrapRequest(
       'setMockLocation latitude: $latitude, longitude: $longitude',
-      () => _client.setMockLocation(
-        SetMockLocationRequest(
-          latitude: latitude,
-          longitude: longitude,
-          packageName: packageName ?? _config.packageName,
-        ),
-      ),
+          () =>
+          _client.setMockLocation(
+            SetMockLocationRequest(
+              latitude: latitude,
+              longitude: longitude,
+              packageName: packageName ?? _config.packageName,
+            ),
+          ),
     );
   }
 

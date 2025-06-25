@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
@@ -24,11 +25,11 @@ class NativeAutomatorClientException implements Exception {
 }
 
 class NativeAutomatorClient {
-  NativeAutomatorClient(
-    this._client,
-    this._apiUri, {
-    Duration timeout = const Duration(seconds: 30),
-  })  : _timeout = timeout,
+  NativeAutomatorClient(this._client,
+      this._apiUri, {
+        Duration timeout = const Duration(seconds: 30),
+      })
+      : _timeout = timeout,
         _headers = {
           'Connection': 'keep-alive',
           'Keep-Alive': 'timeout=${timeout.inSeconds}',
@@ -45,9 +46,7 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<void> configure(
-    ConfigureRequest request,
-  ) {
+  Future<void> configure(ConfigureRequest request,) {
     return _sendRequest(
       'configure',
       request.toJson(),
@@ -60,10 +59,11 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<void> createScreenshot() {
-    return _sendRequest(
-      'createScreenshot',
+  Future<Uint8List> createScreenshot() async {
+    final json = await _sendPlainRequest(
+        'createScreenshot'
     );
+    return json;
   }
 
   Future<void> pressBack() {
@@ -84,36 +84,28 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<void> openApp(
-    OpenAppRequest request,
-  ) {
+  Future<void> openApp(OpenAppRequest request,) {
     return _sendRequest(
       'openApp',
       request.toJson(),
     );
   }
 
-  Future<void> openQuickSettings(
-    OpenQuickSettingsRequest request,
-  ) {
+  Future<void> openQuickSettings(OpenQuickSettingsRequest request,) {
     return _sendRequest(
       'openQuickSettings',
       request.toJson(),
     );
   }
 
-  Future<void> openUrl(
-    OpenUrlRequest request,
-  ) {
+  Future<void> openUrl(OpenUrlRequest request,) {
     return _sendRequest(
       'openUrl',
       request.toJson(),
     );
   }
 
-  Future<GetNativeUITreeRespone> getNativeUITree(
-    GetNativeUITreeRequest request,
-  ) async {
+  Future<GetNativeUITreeRespone> getNativeUITree(GetNativeUITreeRequest request,) async {
     final json = await _sendRequest(
       'getNativeUITree',
       request.toJson(),
@@ -121,9 +113,7 @@ class NativeAutomatorClient {
     return GetNativeUITreeRespone.fromJson(json);
   }
 
-  Future<GetNativeViewsResponse> getNativeViews(
-    GetNativeViewsRequest request,
-  ) async {
+  Future<GetNativeViewsResponse> getNativeViews(GetNativeViewsRequest request,) async {
     final json = await _sendRequest(
       'getNativeViews',
       request.toJson(),
@@ -131,54 +121,42 @@ class NativeAutomatorClient {
     return GetNativeViewsResponse.fromJson(json);
   }
 
-  Future<void> tap(
-    TapRequest request,
-  ) {
+  Future<void> tap(TapRequest request,) {
     return _sendRequest(
       'tap',
       request.toJson(),
     );
   }
 
-  Future<void> doubleTap(
-    TapRequest request,
-  ) {
+  Future<void> doubleTap(TapRequest request,) {
     return _sendRequest(
       'doubleTap',
       request.toJson(),
     );
   }
 
-  Future<void> tapAt(
-    TapAtRequest request,
-  ) {
+  Future<void> tapAt(TapAtRequest request,) {
     return _sendRequest(
       'tapAt',
       request.toJson(),
     );
   }
 
-  Future<void> enterText(
-    EnterTextRequest request,
-  ) {
+  Future<void> enterText(EnterTextRequest request,) {
     return _sendRequest(
       'enterText',
       request.toJson(),
     );
   }
 
-  Future<void> swipe(
-    SwipeRequest request,
-  ) {
+  Future<void> swipe(SwipeRequest request,) {
     return _sendRequest(
       'swipe',
       request.toJson(),
     );
   }
 
-  Future<void> waitUntilVisible(
-    WaitUntilVisibleRequest request,
-  ) {
+  Future<void> waitUntilVisible(WaitUntilVisibleRequest request,) {
     return _sendRequest(
       'waitUntilVisible',
       request.toJson(),
@@ -245,18 +223,14 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<void> enableDarkMode(
-    DarkModeRequest request,
-  ) {
+  Future<void> enableDarkMode(DarkModeRequest request,) {
     return _sendRequest(
       'enableDarkMode',
       request.toJson(),
     );
   }
 
-  Future<void> disableDarkMode(
-    DarkModeRequest request,
-  ) {
+  Future<void> disableDarkMode(DarkModeRequest request,) {
     return _sendRequest(
       'disableDarkMode',
       request.toJson(),
@@ -293,9 +267,7 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<GetNotificationsResponse> getNotifications(
-    GetNotificationsRequest request,
-  ) async {
+  Future<GetNotificationsResponse> getNotifications(GetNotificationsRequest request,) async {
     final json = await _sendRequest(
       'getNotifications',
       request.toJson(),
@@ -303,18 +275,14 @@ class NativeAutomatorClient {
     return GetNotificationsResponse.fromJson(json);
   }
 
-  Future<void> tapOnNotification(
-    TapOnNotificationRequest request,
-  ) {
+  Future<void> tapOnNotification(TapOnNotificationRequest request,) {
     return _sendRequest(
       'tapOnNotification',
       request.toJson(),
     );
   }
 
-  Future<PermissionDialogVisibleResponse> isPermissionDialogVisible(
-    PermissionDialogVisibleRequest request,
-  ) async {
+  Future<PermissionDialogVisibleResponse> isPermissionDialogVisible(PermissionDialogVisibleRequest request,) async {
     final json = await _sendRequest(
       'isPermissionDialogVisible',
       request.toJson(),
@@ -322,18 +290,14 @@ class NativeAutomatorClient {
     return PermissionDialogVisibleResponse.fromJson(json);
   }
 
-  Future<void> handlePermissionDialog(
-    HandlePermissionRequest request,
-  ) {
+  Future<void> handlePermissionDialog(HandlePermissionRequest request,) {
     return _sendRequest(
       'handlePermissionDialog',
       request.toJson(),
     );
   }
 
-  Future<void> setLocationAccuracy(
-    SetLocationAccuracyRequest request,
-  ) {
+  Future<void> setLocationAccuracy(SetLocationAccuracyRequest request,) {
     return _sendRequest(
       'setLocationAccuracy',
       request.toJson(),
@@ -346,9 +310,7 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<void> setMockLocation(
-    SetMockLocationRequest request,
-  ) {
+  Future<void> setMockLocation(SetMockLocationRequest request,) {
     return _sendRequest(
       'setMockLocation',
       request.toJson(),
@@ -361,16 +323,15 @@ class NativeAutomatorClient {
     );
   }
 
-  Future<Map<String, dynamic>> _sendRequest(
-    String requestName, [
+  Future<Map<String, dynamic>> _sendRequest(String requestName, [
     Map<String, dynamic>? request,
   ]) async {
     final response = await _client
         .post(
-          _apiUri.resolve(requestName),
-          body: jsonEncode(request),
-          headers: _headers,
-        )
+      _apiUri.resolve(requestName),
+      body: jsonEncode(request),
+      headers: _headers,
+    )
         .timeout(_timeout);
 
     if (response.statusCode != 200) {
@@ -380,5 +341,27 @@ class NativeAutomatorClient {
     return response.body.isNotEmpty
         ? jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>
         : {};
+  }
+
+  Future<Uint8List> _sendPlainRequest(String requestName, [
+    Map<String, dynamic>? request,
+  ]) async {
+    final response = await _client
+        .post(
+      _apiUri.resolve(requestName),
+      body: jsonEncode(request),
+      headers: _headers,
+    )
+        .timeout(_timeout);
+
+    if (response.statusCode != 200) {
+      throw NativeAutomatorClientException(response.statusCode, response.body);
+    }
+
+    if (response.bodyBytes.isEmpty) {
+      throw NativeAutomatorClientException(500, "No data received from the server.");
+    }
+
+    return response.bodyBytes;
   }
 }

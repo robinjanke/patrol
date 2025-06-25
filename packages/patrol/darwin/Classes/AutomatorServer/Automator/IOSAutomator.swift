@@ -35,7 +35,7 @@
       }
     }
 
-    func createScreenshot() throws {
+    func createScreenshot() throws -> Data {
       // let screenshotName: String = "demo.png"
       try runAction("create a screenshot from the device") {
 
@@ -55,6 +55,9 @@
 //        if (!screenshotAttachment.name.isEmpty)  {
 //            screenshotName = screenshotAttachment.name
 //        }
+
+        return fullScreenshot.pngRepresentation
+        // return ["screenshotContent": fullScreenshot.pngRepresentation, "deviceName": UIDevice.current.name]
 
       }
 

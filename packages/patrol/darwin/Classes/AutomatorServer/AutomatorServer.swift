@@ -20,9 +20,9 @@
 
     // MARK: General
 
-    func createScreenshot() throws {
+    func createScreenshot() throws -> Data {
       return try runCatching {
-        try automator.createScreenshot()
+        return try automator.createScreenshot()
       }
     }
 
